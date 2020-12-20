@@ -55,11 +55,12 @@ namespace MazeGeneration {
 		void MazeWalk(char[,] map, Coord startingPoint, Coord stepSize, Coord wallSize) {
 			List<Coord> possibleIntersections = new List<Coord>();
 			possibleIntersections.Add(startingPoint);
-			if((showOption & ShowOption.EachStep) != 0) Show(map);
+			bool newMazeFeatures = true;
 			while (possibleIntersections.Count > 0) {
-				if (MazeWalkOneStep(map, possibleIntersections, stepSize, wallSize)) {
+				if (newMazeFeatures) {
 					if ((showOption & ShowOption.EachStep) != 0) Show(map);
 				}
+				newMazeFeatures = MazeWalkOneStep(map, possibleIntersections, stepSize, wallSize);
 			}
 			if ((showOption & ShowOption.Final) != 0) Show(map);
 		}

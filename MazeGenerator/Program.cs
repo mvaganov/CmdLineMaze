@@ -5,7 +5,8 @@
 				seed = System.Environment.TickCount;
 			string filename = "maze.txt";
 			MazeGenerator.ShowOption opt = MazeGenerator.ShowOption.Final;
-			MazeGenerator.WriteMaze(width, height, px, py, stepx, stepy, wallx, wally, seed, filename, opt);
+			//MazeGenerator.WriteMaze(width, height, px, py, stepx, stepy, wallx, wally, seed, filename, opt);
+			MazeGen.WriteMaze(width, height, px, py, seed, filename);
 		}
 	}
 }
