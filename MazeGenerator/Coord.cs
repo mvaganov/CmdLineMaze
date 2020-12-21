@@ -20,6 +20,13 @@
 		public bool IsWithin(Coord boundary) {
 			return col >= 0 && row >= 0 && col < boundary.col && row < boundary.row;
 		}
+		public bool Iterate(Coord max, short mincol = 0) {
+			if (++col >= max.col) {
+				if (++row >= max.row) { return false; }
+				col = mincol;
+			}
+			return true;
+		}
 	}
 	public static class MatrixCoordExtension { // what is going on here?
 		public static Coord GetSize<TYPE>(this TYPE[,] matrix) {
@@ -43,5 +50,4 @@
 			SetAt(matrix, Coord.Zero, matrix.GetSize(), value);
 		}
 	}
-
 }
