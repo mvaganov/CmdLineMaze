@@ -6,8 +6,18 @@ namespace CmdLineMaze {
 		public ConsoleKey key;
 		public Action action;
 		public string description;
-		public KBind(ConsoleKey key, Action action, string description = "") {
+		public enum Press { None, Pressed, Unpressed }
+		public Press shift, ctrl, alt;
+		public KBind(ConsoleKey key, Action action, string description = "", Press shift = Press.None,
+			Press ctrl = Press.None, Press alt = Press.None) {
 			this.key = key; this.action = action; this.description = description;
+			this.shift = shift; this.ctrl = ctrl; this.alt = alt;
+		}
+		public bool IsSatisfied(ConsoleKeyInfo keyinfo) {
+			bool s = shift== Press.None || keyinfo.Modifiers.HasFlag(ConsoleModifiers.Shift)  == (shift == Press.Pressed);
+			bool c = ctrl == Press.None || keyinfo.Modifiers.HasFlag(ConsoleModifiers.Control)== (ctrl == Press.Pressed);
+			bool a = alt  == Press.None || keyinfo.Modifiers.HasFlag(ConsoleModifiers.Alt)    == (alt == Press.Pressed);
+			return s && c && a;
 		}
 	}
 	public class InputListing {
@@ -63,13 +73,17 @@ namespace CmdLineMaze {
 	}
 	public class AppInput {
 		public InputListing currentKeyBinds = new InputListing();
-		public bool DoKeyPress(ConsoleKey key) {
-			IList<KBind> keyBindings = currentKeyBinds.Get(key);
-			if(keyBindings != null) {
-				for(int i = 0; i < keyBindings.Count; ++i) {
-					keyBindings[i].action.Invoke();
+		public bool DoKeyPress(ConsoleKeyInfo key) {
+			IList<KBind> kBinds = currentKeyBinds.Get(key.Key);
+			if(kBinds != null) {
+				bool active = false;
+				for(int i = 0; i < kBinds.Count; ++i) {
+					if (kBinds[i].IsSatisfied(key)) {
+						kBinds[i].action.Invoke();
+						active = true;
+					}
 				}
-				return true;
+				return active;
 			}
 			return false;
 		}

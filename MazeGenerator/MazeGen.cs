@@ -5,6 +5,7 @@ using System.Text;
 namespace MazeGeneration {
 	public class MazeGen {
 		const char Filled = '#', Walkable = ' ';
+		public static bool show = false;
 		public static void WriteMaze(int width, int height, int startx, int starty, int seed, string filename) {
 			string maze = CreateMaze(new Coord(width, height), new Coord(startx, starty), seed);
 			System.IO.File.WriteAllText(filename, maze);
@@ -48,9 +49,7 @@ namespace MazeGeneration {
 			possibleIntersections.Add(startingPoint);
 			bool userNeedsToSeeMaze = true;
 			while (possibleIntersections.Count > 0) {
-				if (userNeedsToSeeMaze) {
-					Show(map);
-				}
+				if (show && userNeedsToSeeMaze) { Show(map); }
 				userNeedsToSeeMaze = MazeWalkOneStep(map, possibleIntersections);
 			}
 		}

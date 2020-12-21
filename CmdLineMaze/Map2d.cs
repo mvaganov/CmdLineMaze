@@ -1,11 +1,11 @@
 ﻿using System;
 
 namespace CmdLineMaze {
-	public interface Drawable {
+	public interface IDrawable {
 		public void Draw(ConsoleTile[,] screen, Coord offset);
 	}
 
-	public class Map2d : IRect, Drawable {
+	public class Map2d : IRect, IDrawable {
 		private ConsoleTile[,] map;
 		public int transparentLetter = -1;
 
@@ -41,6 +41,10 @@ namespace CmdLineMaze {
 		}
 
 		public void Fill(ConsoleTile fill) { map.Fill(fill); }
+
+		public void Fill(ConsoleTile fill, Rect where) {
+			map.SetAt(where.GetPosition(), where.GetSize(), fill);
+		}
 
 		public void Copy(Map2d m) {
 			SetSize(m.GetSize());

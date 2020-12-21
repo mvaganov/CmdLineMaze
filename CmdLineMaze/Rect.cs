@@ -26,9 +26,8 @@ namespace CmdLineMaze {
 		public int Right { get => max.col; set => max.col = (short)value; }
 
 		public Coord GetPosition() => min;
-
+		public Coord GetSize() => max - min;
 		public Rect GetRect() => this;
-
 		public Coord Size => max - min;
 
 		public Rect Intersect(Rect r) {
