@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SimpleGame {
 	/// <summary>
@@ -9,6 +7,6 @@ namespace SimpleGame {
 	class Rando {
 		static long seed;
 		public static void Seed(long num) { seed = num; }
-		public static long Next => seed = seed * 6364136223846793005 + 1442695040888963407;
+		public static long Next => Math.Abs(seed = seed * 6364136223846793005 + 1442695040888963407);
 	}
 }
