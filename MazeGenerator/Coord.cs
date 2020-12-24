@@ -6,7 +6,9 @@
 		}
 		public short X => col; // what is going on here?
 		public short Y => row;
+
 		public static Coord Zero = new Coord(0, 0);
+		public static Coord One = new Coord(1, 1);
 		public static Coord Up = new Coord(0, -1);
 		public static Coord Left = new Coord(-1, 0);
 		public static Coord Down = new Coord(0, 1);
@@ -16,6 +18,9 @@
 		}
 		public static Coord operator *(Coord a, Coord b) {
 			return new Coord(a.col * b.col, a.row * b.row);
+		}
+		public static Coord operator -(Coord a, Coord b) {
+			return new Coord(a.col - b.col, a.row - b.row);
 		}
 		public bool IsWithin(Coord boundary) {
 			return col >= 0 && row >= 0 && col < boundary.col && row < boundary.row;

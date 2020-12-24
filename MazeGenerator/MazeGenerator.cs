@@ -76,11 +76,16 @@ namespace MazeGeneration {
 			int whichStepToTake = random.Next(possibleNextSteps.Count);
 			Coord dir = possibleNextSteps[whichStepToTake];
 			position += dir * stepSize;
-			map.SetAt(position, stepSize, Walkable);
+			Coord mapSize = map.GetSize();
+			if ((position + stepSize - Coord.One).IsWithin(mapSize)) {
+				map.SetAt(position, stepSize, Walkable);
+			}
 			int relevantCount = dir.col != 0 ? wallSize.col : wallSize.row;
 			for (int i = 0; i < relevantCount; ++i) {
 				position += dir;
-				map.SetAt(position, stepSize, Walkable);
+				if ((position + stepSize - Coord.One).IsWithin(mapSize)) {
+					map.SetAt(position, stepSize, Walkable);
+				}
 			}
 			possibleIntersections.Add(position);
 			return true;

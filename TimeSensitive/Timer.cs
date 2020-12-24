@@ -21,10 +21,7 @@ namespace TimeSensitive {
 			}
 			public static Comparer comparer = new Comparer();
 		}
-
-		private Timer() {
-			_lastUpdateRealtime = NowRealTime;
-		}
+		private Timer() { _lastUpdateRealtime = NowRealTime; }
 		public static void setTimeout(Action action, int delayMs) => Instance.AddTask(delayMs, action);
 
 		public void AddTask(long delayMs, Action action) {
@@ -38,7 +35,7 @@ namespace TimeSensitive {
 			}
 			tasks.Insert(properIndex, task);
 		}
-
+		public void Init() { }
 		public void Update() {
 			int index;
 			while(tasks.Count > 0 && NowRealTime > tasks[(index = tasks.Count - 1)].when) {
@@ -48,6 +45,9 @@ namespace TimeSensitive {
 			long now = NowRealTime;
 			_deltaTime = (int)(now - _lastUpdateRealtime);
 			_lastUpdateRealtime = now;
+		}
+		public void Release() {
+			tasks.Clear();
 		}
 	}
 }

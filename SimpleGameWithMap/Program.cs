@@ -1,7 +1,8 @@
 ﻿using System;
 namespace SimpleGameWithmap {
-	class Program2 {
+	class Program {
 		public static void Main(string[] args) {
+			ConsoleColor normalColor = Console.ForegroundColor;
 			string mapStr =
 			".............................." +
 			".............................." +
@@ -37,7 +38,9 @@ namespace SimpleGameWithmap {
 					Console.Write('\n');
 				}
 				Console.SetCursorPosition(x, y);
+				Console.ForegroundColor = ConsoleColor.Green;
 				Console.Write(player);
+				Console.ForegroundColor = normalColor;
 				Console.SetCursorPosition(0, height);
 				ConsoleKeyInfo userInput = Console.ReadKey();
 				switch (userInput.KeyChar) {
