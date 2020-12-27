@@ -1,7 +1,10 @@
 ﻿using System;
 
 namespace CmdLineMaze {
-	public struct ConsoleTile {
+	public interface IDrawable {
+		public void Draw(ConsoleTile[,] screen, Coord offset);
+	}
+	public struct ConsoleTile : IDrawable {
 		public char letter;
 		public byte fore, back;
 
@@ -51,5 +54,7 @@ namespace CmdLineMaze {
 		public static bool operator !=(ConsoleTile a, ConsoleTile b) { return !a.Equals(b); }
 
 		public void Write() { ApplyColor(); Console.Write(letter); }
+
+		public void Draw(ConsoleTile[,] screen, Coord offset) { screen.SetAt(offset, this); }
 	}
 }

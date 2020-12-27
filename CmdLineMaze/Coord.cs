@@ -11,8 +11,8 @@ namespace CmdLineMaze {
 			this.row = (short)row;
 		}
 
-		public int X => col;
-		public int Y => row;
+		public int X { get => col; set => col = (short)value; }
+		public int Y { get => row; set => row = (short)value; }
 
 		public static readonly Coord Zero = new Coord(0, 0);
 		public static readonly Coord One = new Coord(1, 1);

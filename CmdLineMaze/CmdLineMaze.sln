@@ -14,7 +14,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleGame", "..\SimpleGame
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MazeGeneration", "..\MazeGenerator\MazeGeneration.csproj", "{CC8FD203-7FEB-45EC-A3C6-F51B64B1153A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleGameWithMap", "..\SimpleGameWithMap\SimpleGameWithMap.csproj", "{299AA6A1-AE2F-4E6C-A945-F98C6C1D37F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleGameWithMap", "..\SimpleGameWithMap\SimpleGameWithMap.csproj", "{299AA6A1-AE2F-4E6C-A945-F98C6C1D37F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomHashTable", "..\CustomHashTable\CustomHashTable.csproj", "{6EBE3FED-A412-4BB0-948D-81A3D176A803}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,6 +44,10 @@ Global
 		{299AA6A1-AE2F-4E6C-A945-F98C6C1D37F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{299AA6A1-AE2F-4E6C-A945-F98C6C1D37F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{299AA6A1-AE2F-4E6C-A945-F98C6C1D37F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6EBE3FED-A412-4BB0-948D-81A3D176A803}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6EBE3FED-A412-4BB0-948D-81A3D176A803}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6EBE3FED-A412-4BB0-948D-81A3D176A803}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6EBE3FED-A412-4BB0-948D-81A3D176A803}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

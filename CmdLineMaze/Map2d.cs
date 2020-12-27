@@ -1,13 +1,9 @@
 ﻿using System;
 
 namespace CmdLineMaze {
-	public interface IDrawable {
-		public void Draw(ConsoleTile[,] screen, Coord offset);
-	}
-
 	public class Map2d : IRect, IDrawable {
 		private ConsoleTile[,] map;
-		public int transparentLetter = -1;
+		public ConsoleTile transparentLetter = new ConsoleTile('\0', ConsoleColor.Black, ConsoleColor.Black);
 
 		public Map2d() => SetSize(Coord.Zero);
 

@@ -48,7 +48,7 @@ namespace CmdLineMaze {
 				new KBind(ConsoleKey.RightArrow, () => MapScroll(Coord.Right), "pan map right"))
 			};
 			InputListing system = new InputListing(
-				new KBind(ConsoleKey.F1, PrintKeyBindings, "show key bindings"),
+				new KBind(ConsoleKey.H, PrintKeyBindings, "show key bindings"),
 				new KBind(ConsoleKey.M, ()=> {
 					appInput.Remove(controlSchema[controlSchemeIndex]);
 					++controlSchemeIndex; controlSchemeIndex %= controlSchema.Length;
@@ -70,7 +70,7 @@ namespace CmdLineMaze {
 			if (!mob.position.IsWithin(maze.GetSize()) || maze[mob.position].letter == '#') {
 				mob.position = mob.lastValidPosition;
 			} else {
-				mob.lastValidPosition = mob.position;
+														mob.lastValidPosition = mob.position;
 			}
 		}
 

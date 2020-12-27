@@ -1,5 +1,14 @@
 ﻿using System;
 namespace SimpleGameWithmap {
+	// TODO collision detection. priori vs postori
+	// TODO add item
+	// TODO change collision detection after item pickup
+	// TODO make entity class
+	// TODO put letter and color in the entity class, Draw()
+	// TODO add enemy
+	// TODO enemy moves
+	// TODO update logic for entities, init
+	// TODO drawlist and updatelist
 	class Program {
 		public static void Main(string[] args) {
 			ConsoleColor normalColor = Console.ForegroundColor;

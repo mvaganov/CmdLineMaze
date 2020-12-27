@@ -2,6 +2,7 @@
 namespace CmdLineMaze {
 	public interface IRect : IPosition { Rect GetRect(); }
 
+	// AABB : Axis Aligned Bounding Box
 	public struct Rect : IPosition, IRect {
 		public Coord min, max;
 

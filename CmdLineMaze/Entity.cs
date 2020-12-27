@@ -7,7 +7,6 @@ namespace CmdLineMaze {
 		public Coord position;
 
 		public Action onUpdate;
-		public Action<EntityBase> onTrigger;
 		public virtual void Update() { onUpdate?.Invoke(); }
 		public abstract void Draw(ConsoleTile[,] map, Coord offset);
 		public virtual Coord GetPosition() => position;
