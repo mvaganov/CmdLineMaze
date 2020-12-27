@@ -1,32 +1,58 @@
-﻿using System;
+﻿//#define EXTRA_DATA_TEST
+using System;
+using System.Collections.Generic;
 
 namespace CustomHashTable {
 	class Program {
 		static void Main(string[] args) {
-			HTable<string, int> stats = new HTable<string, int>(HashFunctions.GetDeterministicHashCode) {
-				["str"] = 10,
-				["dex"] = 18,
-				["con"] = 12,
-				["int"] = 10,
-				["wis"] = 10,
-				["cha"] = 15,
-			};
-			Console.WriteLine(stats.ToDebugString());
-			HTable<string, int>.KV[] kvs = new HTable<string, int>.KV[] {
-				new HTable<string, int>.KV{key="str",val=10},
-				new HTable<string, int>.KV{key="dex",val=11},
-				new HTable<string, int>.KV{key="con",val=12},
-				new HTable<string, int>.KV{key="int",val=13},
-				new HTable<string, int>.KV{key="wis",val=14},
-				new HTable<string, int>.KV{key="cha",val=15},
+			BasicMap<string, int> bMap = new BasicMap<string, int>();
+			SortedMap<string, int> sMap = new SortedMap<string, int>();
+			SortedHashedMap<string, int> shMap = new SortedHashedMap<string, int>();
+			HTable<string, int> hTable = new HTable<string, int>(HashFunctions.GetDeterministicHashCode, 8);
+			KeyValuePair<string,int>[] kvs = new KeyValuePair<string, int>[] {
+				new KeyValuePair<string, int>("str",10),
+				new KeyValuePair<string, int>("dex",11),
+				new KeyValuePair<string, int>("con",12),
+				new KeyValuePair<string, int>("int",13),
+				new KeyValuePair<string, int>("wis",14),
+				new KeyValuePair<string, int>("cha",15),
+#if EXTRA_DATA_TEST
+				new KeyValuePair<string, int>("Athletics",0),
+				new KeyValuePair<string, int>("Acrobatics",1),
+				new KeyValuePair<string, int>("SleightOfHand",2),
+				new KeyValuePair<string, int>("Stealth",2),
+				new KeyValuePair<string, int>("Arcana",0),
+				new KeyValuePair<string, int>("History",0),
+				new KeyValuePair<string, int>("Investigation",2),
+				new KeyValuePair<string, int>("Nature",0),
+				new KeyValuePair<string, int>("Religion",0),
+				new KeyValuePair<string, int>("AnimalHandling",0),
+				new KeyValuePair<string, int>("Insight",1),
+				new KeyValuePair<string, int>("Medicine",0),
+				new KeyValuePair<string, int>("Perception",2),
+				new KeyValuePair<string, int>("Survival",0),
+				new KeyValuePair<string, int>("Deception",2),
+				new KeyValuePair<string, int>("Intimidation",0),
+				new KeyValuePair<string, int>("Performance",0),
+				new KeyValuePair<string, int>("Persuasion",2),
+#endif
 			};
 			for(int i = 0; i < kvs.Length; ++i) {
-				stats[kvs[i].key] = kvs[i].val;
+				string k = kvs[i].Key; int v = kvs[i].Value;
+				bMap.Set(k, v);
+				sMap.Set(k, v);
+				shMap.Set(k, v);
+				hTable[k] = v;
 			}
-			Console.WriteLine("\n"+stats.ToDebugString()+ "\n");
-			foreach (var kvp in stats) {
-				Console.WriteLine(kvp.Key + ": " + kvp.Value);
-			}
+			Console.WriteLine("bMap\n" + bMap.ToDebugString() + "\n");
+			Console.WriteLine("sMap\n" + sMap.ToDebugString() + "\n");
+			Console.WriteLine("shMap\n" + shMap.ToDebugString() + "\n");
+			Console.WriteLine("htable\n" + hTable.ToDebugString() + "\n");
+
+			for (int i = 0; i < kvs.Length; ++i) { Console.Write(kvs[i].Key + ": " + bMap.Get(kvs[i].Key) + " "); } Console.WriteLine();
+			for (int i = 0; i < kvs.Length; ++i) { Console.Write(kvs[i].Key + ": " + sMap.Get(kvs[i].Key) + " "); } Console.WriteLine();
+			for (int i = 0; i < kvs.Length; ++i) { Console.Write(kvs[i].Key + ": " + shMap.Get(kvs[i].Key) + " "); } Console.WriteLine();
+			for (int i = 0; i < kvs.Length; ++i) { Console.Write(kvs[i].Key + ": " + hTable[kvs[i].Key] + " "); } Console.WriteLine();
 			Console.WriteLine("done!");
 		}
 	}

@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace CustomHashTable {
-	public class HTable<KEY, VAL> : IDictionary<KEY, VAL> {
+	public class HTable<KEY, VAL> : IDictionary<KEY, VAL> where KEY : IComparable<KEY> {
 		public Func<KEY, int> hFunc = null;
 		public List<List<KV>> buckets;
 		public const int defaultBuckets = 8;
@@ -21,8 +21,8 @@ namespace CustomHashTable {
 			public static Comparer comparer = new Comparer();
 			public static implicit operator KeyValuePair<KEY,VAL>(KV k) => new KeyValuePair<KEY, VAL>(k.key, k.val);
 		}
-		private KV kv(KEY key) => new KV(Hash(key), key);
-		private KV kv(KEY key, VAL val) => new KV(Hash(key), key, val);
+		private KV Kv(KEY key) => new KV(Hash(key), key);
+		private KV Kv(KEY key, VAL val) => new KV(Hash(key), key, val);
 		public HTable(Func<KEY, int> hashFunc, int bCount = defaultBuckets) { hFunc = hashFunc; BucketCount = bCount; }
 		public HTable() { }
 		public HTable(int bucketCount) { BucketCount = bucketCount; }
@@ -41,57 +41,63 @@ namespace CustomHashTable {
 				List<List<KV>> oldbuckets = buckets;
 				buckets = new List<List<KV>>(value);
 				for (int i = 0; i < value; ++i) { buckets.Add(null); }
-				if (oldbuckets != null) {
-					oldbuckets.ForEach(b => b.ForEach(kvp => Set(kvp)));
-				}
+				oldbuckets?.ForEach(b => b?.ForEach(kvp => Set(kvp)));
 			}
 		}
-
-		public void FindEntry(KV kvp, out List<KV> bucket, out int bestIndexInBucket, out bool alreadyInHere) {
+		int FindExactIndex(KV kvp, int index, List<KV> list) {
+			while (index > 0 && list[index - 1].hash == kvp.hash) { --index; }
+			do {
+				int compareValue = list[index].key.CompareTo(kvp.key);
+				if (compareValue == 0) return index;
+				if (compareValue > 0) return ~index;
+				++index;
+			} while (index < list.Count && list[index].hash == kvp.hash);
+			return ~index;
+		}
+		public void FindEntry(KV kvp, out List<KV> bucket, out int bestIndexInBucket) {
 			int whichBucket = kvp.hash % buckets.Count;
 			bucket = buckets[whichBucket];
 			if (bucket == null) { buckets[whichBucket] = bucket = new List<KV>(); }
 			bestIndexInBucket = bucket.BinarySearch(kvp, KV.comparer);
-			if (bestIndexInBucket < 0) { bestIndexInBucket = ~bestIndexInBucket; }
-			int i = bestIndexInBucket;
-			do {
-				alreadyInHere = bucket.Count > bestIndexInBucket && bucket[i].key.Equals(kvp.key);
-				if (alreadyInHere) {
-					bestIndexInBucket = i;
-					return;
-				}
-			} while (i+1 < bucket.Count && bucket[i++].key.GetHashCode() == kvp.hash);
+			if (bestIndexInBucket < 0) { return; }
+			bestIndexInBucket = FindExactIndex(kvp, bestIndexInBucket, bucket);
 		}
+		public bool Set(KEY key, VAL val) => Set(Kv(key, val));
 		public bool Set(KV kvp) {
 			if (buckets == null) { BucketCount = defaultBuckets; }
-			FindEntry(kvp, out List<KV> bucket, out int bestIndexInBucket, out bool alreadyInHere);
-			if (alreadyInHere) {
-				bucket[bestIndexInBucket] = kvp;
+			FindEntry(kvp, out List<KV> bucket, out int bestIndexInBucket);
+			if (bestIndexInBucket < 0) {
+				bucket.Insert(~bestIndexInBucket, kvp);
 			} else {
-				bucket.Insert(bestIndexInBucket, kvp);
+				bucket[bestIndexInBucket] = kvp;
 			}
-			return !alreadyInHere;
+			return bestIndexInBucket < 0;
 		}
-
 		public bool TryGet(KEY key, out KV entry) {
-			entry = kv(key);
+			entry = Kv(key);
 			if (buckets == null) return false;
-			FindEntry(entry, out List<KV> bucket, out int bestIndexInBucket, out bool alreadyInHere);
-			if (alreadyInHere) {
+			FindEntry(entry, out List<KV> bucket, out int bestIndexInBucket);
+			if (bestIndexInBucket >= 0) {
 				entry = bucket[bestIndexInBucket];
 				return true;
 			}
 			return false;
+		}
+		public VAL Get(KEY key) {
+			KV kvPair;
+			if (TryGet(key, out kvPair)) { return kvPair.val; }
+			throw new Exception($"map does not contain key '{key}'");
 		}
 		public string ToDebugString() {
 			StringBuilder sb = new StringBuilder();
 			for (int b = 0; b < buckets.Count; ++b) {
 				if(b>0)sb.Append("\n");
 				sb.Append(b.ToString()).Append(": ");
-				if (buckets[b] != null) {
-					for (int i = 0; i < buckets[b].Count; ++i) {
+				List<KV> bucket = buckets[b];
+				if (bucket != null) {
+					for (int i = 0; i < bucket.Count; ++i) {
 						if (i > 0) sb.Append(", ");
-						sb.Append(buckets[b][i].ToString());
+						sb.Append(bucket[i].ToString());
 					}
 				}
 			}
@@ -116,23 +122,21 @@ namespace CustomHashTable {
 
 		public bool IsReadOnly => false;
 
-		public VAL this[KEY key] { get {
-				if (TryGet(key, out KV found)) { return found.val; }
-				throw new Exception("Could not find " + key + ", use TryGet instead?");
-			}
-			set => Add(key, value);
+		public VAL this[KEY key] {
+			get => Get(key);
+			set => Set(key, value);
 		}
 
-		public void Add(KEY key, VAL value) { Set(kv(key, value)); }
+		public void Add(KEY key, VAL value) => Set(key, value);
 
 		public bool ContainsKey(KEY key) {
-			FindEntry(kv(key), out List<KV> bucket, out int bestIndexInBucket, out bool alreadyInHere);
-			return alreadyInHere;
+			FindEntry(Kv(key), out List<KV> bucket, out int bestIndexInBucket);
+			return bestIndexInBucket >= 0;
 		}
 
 		public bool Remove(KEY key) {
-			FindEntry(kv(key), out List<KV> bucket, out int bestIndexInBucket, out bool alreadyInHere);
-			if (alreadyInHere) {
+			FindEntry(Kv(key), out List<KV> bucket, out int bestIndexInBucket);
+			if (bestIndexInBucket >= 0) {
 				bucket.RemoveAt(bestIndexInBucket);
 				return true;
 			}
@@ -145,7 +149,7 @@ namespace CustomHashTable {
 			return false;
 		}
 
-		public void Add(KeyValuePair<KEY, VAL> item) => Set(kv(item.Key, item.Value));
+		public void Add(KeyValuePair<KEY, VAL> item) => Set(Kv(item.Key, item.Value));
 
 		public void Clear() {
 			if (buckets == null) return;
@@ -153,8 +157,8 @@ namespace CustomHashTable {
 		}
 
 		public bool Contains(KeyValuePair<KEY, VAL> item) {
-			FindEntry(kv(item.Key), out List<KV> bucket, out int bestIndex, out bool alreadyInHere);
-			return alreadyInHere && bucket[bestIndex].val.Equals(item.Value);
+			FindEntry(Kv(item.Key), out List<KV> bucket, out int bestIndex);
+			return bestIndex >= 0 && bucket[bestIndex].val.Equals(item.Value);
 		}
 
 		public void CopyTo(KeyValuePair<KEY, VAL>[] array, int arrayIndex) {
@@ -170,8 +174,8 @@ namespace CustomHashTable {
 		}
 
 		public bool Remove(KeyValuePair<KEY, VAL> item) {
-			FindEntry(kv(item.Key), out List<KV> bucket, out int bestIndex, out bool alreadyInHere);
-			if (alreadyInHere && item.Value.Equals(bucket[bestIndex].val)) {
+			FindEntry(Kv(item.Key), out List<KV> bucket, out int bestIndex);
+			if (bestIndex >= 0 && item.Value.Equals(bucket[bestIndex].val)) {
 				bucket.RemoveAt(bestIndex);
 				return true;
 			}
@@ -202,22 +206,6 @@ namespace CustomHashTable {
 				return false;
 			}
 			public void Reset() { bucket = index = 0; }
-		}
-	}
-
-	public static class HashFunctions {
-		public static int GetDeterministicHashCode(this string str) {
-			unchecked {
-				int hash1 = (5381 << 16) + 5381;
-				int hash2 = hash1;
-				for (int i = 0; i < str.Length; i += 2) {
-					hash1 = ((hash1 << 5) + hash1) ^ str[i];
-					if (i == str.Length - 1)
-						break;
-					hash2 = ((hash2 << 5) + hash2) ^ str[i + 1];
-				}
-				return hash1 + (hash2 * 1566083941);
-			}
 		}
 	}
 }

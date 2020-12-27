@@ -7,6 +7,12 @@ namespace SimpleGame {
 	class Rando {
 		static long seed;
 		public static void Seed(long num) { seed = num; }
-		public static long Next => Math.Abs(seed = seed * 6364136223846793005 + 1442695040888963407);
+		public static long Next {
+			get {
+				unchecked {
+					return Math.Abs(seed = seed * 6364136223846793005 + 1442695040888963407);
+				}
+			}
+		}
 	}
 }
