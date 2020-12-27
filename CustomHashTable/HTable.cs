@@ -29,20 +29,19 @@ namespace CustomHashTable {
 		public int Count {
 			get {
 				int sum = 0;
-				if (buckets != null) {
-					buckets.ForEach(bucket => sum += bucket != null ? bucket.Count : 0);
-				}
+				if (buckets != null) { buckets.ForEach(bucket => sum += bucket != null ? bucket.Count : 0); }
 				return sum;
 			}
 		}
-		public int BucketCount {
-			get => buckets != null ? buckets.Count : 0;
-			set {
-				List<List<KV>> oldbuckets = buckets;
-				buckets = new List<List<KV>>(value);
-				for (int i = 0; i < value; ++i) { buckets.Add(null); }
-				oldbuckets?.ForEach(b => b?.ForEach(kvp => Set(kvp)));
-			}
+		public int BucketCount { get => buckets != null ? buckets.Count : 0; set => SetHashFunction(hFunc, value); }
+		public Func<KEY,int> HashFunction { get => hFunc; set => SetHashFunction(value, BucketCount); }
+		public void SetHashFunction(Func<KEY,int> hFunc, int bucketCount) {
+			this.hFunc = hFunc;
+			if (bucketCount <= 0) { buckets = null; return; }
+			List<List<KV>> oldbuckets = buckets;
+			buckets = new List<List<KV>>(bucketCount);
+			for (int i = 0; i < bucketCount; ++i) { buckets.Add(null); }
+			oldbuckets?.ForEach(b => b?.ForEach(kvp => Set(kvp.key, kvp.val)));
 		}
 		int FindExactIndex(KV kvp, int index, List<KV> list) {
 			while (index > 0 && list[index - 1].hash == kvp.hash) { --index; }
@@ -84,14 +83,13 @@ namespace CustomHashTable {
 			return false;
 		}
 		public VAL Get(KEY key) {
-			KV kvPair;
-			if (TryGet(key, out kvPair)) { return kvPair.val; }
+			if (TryGet(key, out KV kvPair)) { return kvPair.val; }
 			throw new Exception($"map does not contain key '{key}'");
 		}
 		public string ToDebugString() {
 			StringBuilder sb = new StringBuilder();
 			for (int b = 0; b < buckets.Count; ++b) {
-				if(b>0)sb.Append("\n");
+				if (b > 0) sb.Append("\n");
 				sb.Append(b.ToString()).Append(": ");
 				List<KV> bucket = buckets[b];
 				if (bucket != null) {
@@ -119,21 +117,13 @@ namespace CustomHashTable {
 				return list;
 			}
 		}
-
 		public bool IsReadOnly => false;
-
-		public VAL this[KEY key] {
-			get => Get(key);
-			set => Set(key, value);
-		}
-
+		public VAL this[KEY key] { get => Get(key); set => Set(key, value); }
 		public void Add(KEY key, VAL value) => Set(key, value);
-
 		public bool ContainsKey(KEY key) {
 			FindEntry(Kv(key), out List<KV> bucket, out int bestIndexInBucket);
 			return bestIndexInBucket >= 0;
 		}
-
 		public bool Remove(KEY key) {
 			FindEntry(Kv(key), out List<KV> bucket, out int bestIndexInBucket);
 			if (bestIndexInBucket >= 0) {
@@ -142,25 +132,20 @@ namespace CustomHashTable {
 			}
 			return false;
 		}
-
 		public bool TryGetValue(KEY key, [MaybeNullWhen(false)] out VAL value) {
 			if (TryGet(key, out KV found)) { value = found.val; return true; }
 			value = default;
 			return false;
 		}
-
 		public void Add(KeyValuePair<KEY, VAL> item) => Set(Kv(item.Key, item.Value));
-
 		public void Clear() {
 			if (buckets == null) return;
 			for(int i = 0; i < buckets.Count; ++i) { buckets[i]?.Clear(); }
 		}
-
 		public bool Contains(KeyValuePair<KEY, VAL> item) {
 			FindEntry(Kv(item.Key), out List<KV> bucket, out int bestIndex);
 			return bestIndex >= 0 && bucket[bestIndex].val.Equals(item.Value);
 		}
-
 		public void CopyTo(KeyValuePair<KEY, VAL>[] array, int arrayIndex) {
 			int index = arrayIndex;
 			for(int b = 0; b < buckets.Count; ++b) {
@@ -172,7 +157,6 @@ namespace CustomHashTable {
 				}
 			}
 		}
-
 		public bool Remove(KeyValuePair<KEY, VAL> item) {
 			FindEntry(Kv(item.Key), out List<KV> bucket, out int bestIndex);
 			if (bestIndex >= 0 && item.Value.Equals(bucket[bestIndex].val)) {
@@ -181,11 +165,8 @@ namespace CustomHashTable {
 			}
 			return false;
 		}
-
 		public IEnumerator<KeyValuePair<KEY, VAL>> GetEnumerator() => new Enumerator(this);
-
 		IEnumerator IEnumerable.GetEnumerator() => new Enumerator(this);
-
 		public class Enumerator : IEnumerator<KeyValuePair<KEY, VAL>> {
 			HTable<KEY,VAL> htable;
 			int bucket, index = -1;

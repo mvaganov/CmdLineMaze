@@ -21,6 +21,16 @@ namespace CustomHashTable {
 		public int Hash(KEY key) => Math.Abs(hashFunction != null ? hashFunction(key) : key.GetHashCode());
 		KV Kv(KEY k) => new KV(Hash(k), k);
 		KV Kv(KEY k, VAL v) => new KV(Hash(k), k, v);
+		public Func<KEY, int> HashFunction {
+			get => hashFunction;
+			set => SetHashFunction(value);
+		}
+		public void SetHashFunction(Func<KEY, int> hFunc) {
+			hashFunction = hFunc;
+			List<KV> oldList = list;
+			list = new List<KV>(oldList.Count);
+			oldList?.ForEach(kvp => Set(kvp.key, kvp.val));
+		}
 
 		public bool Set(KEY key, VAL val) => Set(Kv(key, val));
 		public bool Set(KV kv) {
