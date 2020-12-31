@@ -32,8 +32,8 @@ namespace CustomHashTable {
 			oldList?.ForEach(kvp => Set(kvp.key, kvp.val));
 		}
 
-		public bool Set(KEY key, VAL val) => Set(Kv(key, val));
-		public bool Set(KV kv) {
+		public void Set(KEY key, VAL val) => Set(Kv(key, val));
+		public void Set(KV kv) {
 			if(list == null) { list = new List<KV>(); }
 			int bestIndex = list.BinarySearch(kv, KV.comparer);
 			if(bestIndex < 0) {
@@ -46,7 +46,6 @@ namespace CustomHashTable {
 					list.Insert(~bestIndex, kv);
 				}
 			}
-			return bestIndex < 0;
 		}
 
 		int FindExactIndex(KV kvp, int index, List<KV> list) {
