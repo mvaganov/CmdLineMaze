@@ -70,7 +70,7 @@ namespace CmdLineMaze {
 			if (!mob.position.IsWithin(maze.GetSize()) || maze[mob.position].letter == '#') {
 				mob.position = mob.lastValidPosition;
 			} else {
-														mob.lastValidPosition = mob.position;
+				mob.lastValidPosition = mob.position;
 			}
 		}
 

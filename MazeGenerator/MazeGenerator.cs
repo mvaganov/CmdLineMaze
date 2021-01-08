@@ -6,7 +6,7 @@ namespace MazeGeneration {
 	public class MazeGenerator {
 		const char Filled = '#', Walkable = ' ';
 		public enum ShowOption { None = 0, EachStep = 1, PauseOnShow = 2, EachStepPause = 3, Final = 4, FinalPause = 6 }
-		ShowOption showOption = ShowOption.Final;
+		public ShowOption showOption = ShowOption.Final;
 		public static void WriteMaze(int width, int height, int startx, int starty,
 			int stepx, int stepy, int wallx, int wally, int seed, string filename, int erosion = 0, ShowOption option = ShowOption.None) {
 			WriteMaze(new Coord(width, height), new Coord(startx, starty),
@@ -37,10 +37,10 @@ namespace MazeGeneration {
 			return sb.ToString();
 		}
 		Random random;
-		MazeGenerator(int seed) {
+		public MazeGenerator(int seed) {
 			random = new Random(seed);
 		}
-		char[,] Generate(Coord size, Coord start, Coord step, Coord wall) {
+		public char[,] Generate(Coord size, Coord start, Coord step, Coord wall) {
 			char[,] map = new char[size.row, size.col];
 			map.Fill(Filled);
 			if (start.IsWithin(size)) {
