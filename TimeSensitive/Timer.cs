@@ -3,7 +3,8 @@ using System.Collections.Generic;
 
 namespace TimeSensitive {
 	public class Timer {
-		public static long NowRealTime => System.Environment.TickCount;
+		public static long NowRealTime => System.DateTime.Now.Ticks / System.TimeSpan.TicksPerMillisecond;
+		//public static long NowRealTime => System.Environment.TickCount;
 		private long _lastUpdateRealtime = NowRealTime;
 		private int _deltaTime;
 
@@ -39,8 +40,9 @@ namespace TimeSensitive {
 		public void Update() {
 			int index;
 			while(tasks.Count > 0 && NowRealTime > tasks[(index = tasks.Count - 1)].when) {
-				tasks[index].what.Invoke();
+				TimerTask whatToDoRightNow = tasks[index];
 				tasks.RemoveAt(index);
+				whatToDoRightNow.what.Invoke();
 			}
 			long now = NowRealTime;
 			_deltaTime = (int)(now - _lastUpdateRealtime);
