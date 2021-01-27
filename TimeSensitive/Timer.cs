@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace TimeSensitive {
 	public class Timer {
-		public static long NowRealTime => System.DateTime.Now.Ticks / System.TimeSpan.TicksPerMillisecond;
+		public static long NowRealTime => System.DateTime.UtcNow.Ticks / System.TimeSpan.TicksPerMillisecond;
 		//public static long NowRealTime => System.Environment.TickCount;
 		private long _lastUpdateRealtime = NowRealTime;
 		private int _deltaTime;
